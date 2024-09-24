@@ -90,28 +90,18 @@
  :doc "Constraints the selected voices to have only the given intervals."
  :menuins '((2 (("+/-" "+/-") ("abs" "abs"))))
  :icon 486 
- (let ((constraint (eval `(lambda (x)
-                            "ALLOWED-MELODIC-INTERVALS"
-							(if (every #'listp x) ;<== CHORDS
-							    (let* ((split-voices (mat-trans x))
-							           (safe-intervalsv (remove nil ;<== for chords with different number of notes
-										                 (flat
-														  (loop for voice in split-voices 
-										                        collect  
-											                     (mapcar #'(lambda (v1 v2)
-												                            (cond ((or (null v1) (null v2)) nil)
-												                                   (t (if (equal "+/-" ,(reclist-vars mode))
-														                                  (s::-v v2 v1)
-																			              (om?::absv (s::-v v2 v1))))))		   
-												                   voice (cdr voice)))))))
-								 (all-membersv safe-intervalsv ,(reclist-vars intervals)))
-								 
-							   (let ((variables (screamer::variables-in (flat x))));<== NOTES
-							    (if (equal "+/-" ,(reclist-vars mode))
-							        (all-membersv (x->dxv variables) ,(reclist-vars intervals))
-							        (all-membersv (x->dx-absv variables) ,(reclist-vars intervals)))))))))
-									
-  (constraint-one-voice constraint "list" voices "pitch")))
+ (let ((constraint (eval `(lambda (x y)
+                           "ALLOWED-MELODIC-INTERVALS"
+			   (if (and (atom x) (atom y)) ;<== NOTES
+                                (if (equal "+/-" ,(reclist-vars mode))
+                                    (screamer::memberv (s::-v y x) ,(reclist-vars intervals))
+                                    (screamer::memberv (om?::absv (s::-v y x)) ,(reclist-vars intervals)))
+                               (let* ((intervalsv (if (equal "+/-" ,(reclist-vars mode)) ;<== CHORDS
+						      (mapcar #'screamer::-v y x)
+                                                      (mapcar #'(lambda (n1 n2) (om?::absv (screamer::-v n2 n1))) x y))))
+                                  (all-membersv intervalsv ,(reclist-vars intervals)))
+                                )))))		   					
+  (constraint-one-voice constraint "n-inputs" voices "pitch")))
 
   (defun constraint-motifs-internal  (x motifs &optional chain?)
   (let ((vars '())
