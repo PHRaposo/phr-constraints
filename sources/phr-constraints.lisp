@@ -328,8 +328,16 @@ the function will return t, otherwise returns nil."
                          (1 (("no" "no") ("yes" "yes"))))
     :icon 486
     (let ((constraint (if (equal unison? "no")
-                                 (eval `#'(lambda (x) "no-crossing" (apply #'s::>v (remove nil (flat x)))))
-                                 (eval `#'(lambda (x) "no-crossing" (apply #'s::>=v (remove nil (flat x))))))))
+                                 (eval `#'(lambda (x) "no-crossing" 
+                                            (let ((vars (remove nil (flat x))))
+                                                (if vars 
+                                                   (apply #'s::>v vars)
+                                                    t))))
+                                 (eval `#'(lambda (x) "no-crossing" 
+                                            (let ((vars (remove nil (flat x))))
+                                                (if vars 
+                                                   (apply #'s::>=v vars)
+                                                    t)))))))
 
     (if (equal input-mode "all-voices")
        (constraint-harmony constraint  "n-inputs" "all-voices")
@@ -391,10 +399,17 @@ the function will return t, otherwise returns nil."
 
 Returns a list of screamer-score-constraint objects."
   :icon 486
-   (let ((constraints (loop for chord in chords collect (eval `#'(lambda (x) "chord-at-measure" (all-membersv (variables-in (flat x)) ,(reclist-vars chord)))))))
+   (let ((constraints (loop for chord in chords
+                             collect (eval `#'(lambda (x)
+                                                "chord-at-measure"
+                                                (all-true? ;(all-membersv 
+                                                 (mapcar #'(lambda (x)
+                                                            (?::hard-memberv x ,(reclist-vars chord)))
+                                                 (remove-duplicates
+                                                  (variables-in (flat x)) :test #'equal :from-end t))))))))
     (loop for mes in measures
              for cs in constraints
-   collect (constraint-measure (constraint-harmony cs "n-inputs" "voices-list" :voices voices) mes))))
+   collect (constraint-measure (constraint-harmony cs "list" "voices-list" :voices voices) mes))))
 
 (defmethod! chord-at-times ((chords list) (onsets list) (voices list) &optional (mode "midi"))
   :initvals '( nil nil nil "midi")
