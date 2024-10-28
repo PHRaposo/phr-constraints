@@ -402,11 +402,10 @@ Returns a list of screamer-score-constraint objects."
    (let ((constraints (loop for chord in chords
                              collect (eval `#'(lambda (x)
                                                 "chord-at-measure"
-                                                (all-true? ;(all-membersv 
                                                  (mapcar #'(lambda (x)
-                                                            (?::hard-memberv x ,(reclist-vars chord)))
-                                                 (remove-duplicates
-                                                  (variables-in (flat x)) :test #'equal :from-end t))))))))
+                                                            (screamer::assert! (screamer::memberv x ,(reclist-vars chord))))
+                                                  (variables-in (flat x)))
+												  t)))))
     (loop for mes in measures
              for cs in constraints
    collect (constraint-measure (constraint-harmony cs "list" "voices-list" :voices voices) mes))))
@@ -435,13 +434,13 @@ Returns a list of screamer-score-constraint objects."
                               for onset-pair in onset-pairs
                               collect  (eval `#'(lambda (x) "chord-at-times"
                                                          (let ((onset (second x)))
-                                                        (if (null (first x))
+                                                        (if (null (car (remove-duplicates (flat (first x)))))
                                                              t
                                                              (if (and (>= onset ,(first onset-pair))
                                                                          (< onset ,(second onset-pair)))
                                                                  (if (equal ,mode "midi")
-                                                                     (all-membersv (flat (list! (first x))) ,(reclist-vars chord))
-                                                                     (all-membersv (m->pcv (flat (list! (first x))))  ,(reclist-vars (remove-duplicates (m->pcv chord)))))
+                                                                     (all-membersv (remove nil (flat (list! (first x)))) ,(reclist-vars chord))
+                                                                     (all-membersv (m->pcv (remove nil (flat (list! (first x)))))  ,(reclist-vars (remove-duplicates (m->pcv chord)))))
                                                              t))))))))
     (loop for cs in constraints
              collect (constraint-harmony cs "n-inputs" "voices-list" :voices voices :domain "chords-pitch-onset")))))
@@ -505,3 +504,4 @@ the function will return t, otherwise returns nil."
                                      "no-octaves"
                                      (no-oct x)))))
   (constraint-harmony constraint "n-inputs" "voices-list" :voices voices)))
+

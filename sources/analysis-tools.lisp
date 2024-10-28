@@ -1,8 +1,9 @@
 (in-package :om)
 
-; -----------------------------------------		
+;; -----------------------------------------		
+;; ADAPTED FROM OM SOURCES 
 
-; ANALYSIS
+;; ANALYSIS
 
 (defclass! INTERVAL-ANALYSIS (ABSTRACT-ANALYSIS) ())
 
