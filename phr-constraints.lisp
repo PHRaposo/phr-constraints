@@ -19,7 +19,8 @@
 		                 (om-relative-path '("sources") "phr-constraints")
 						 (om::om-relative-path '("sources") "analysis-tools")
 		                 (om-relative-path '("sources") "all-instrument-ranges")
-		                 (om-relative-path '("sources") "instrument-ranges")						 						 
+		                 (om-relative-path '("sources") "instrument-ranges")
+		                 ;(om-relative-path '("sources") "guitar-playable-chord") ;<== IN-PROGRESS						 						 						 
                                ))
 
 ;--------------------------------------------------
@@ -31,10 +32,11 @@
 ;Fill library
 ;--------------------------------------------------
 
-(fill-library '(("MELODIC" nil nil (allowed-melodic-intervals) nil)
-				;("FOLDER2" nil nil (package::function1 package::function2 etc) nil)
-				("UTILS" nil nil (get-fn collect-constraints) nil)			
-			   ))
+(fill-library '(("MELODIC" nil nil (allowed-melodic-intervals constraint-motifs constraint-scale mel-line-intervals) nil)
+		        ("HARMONIC" nil nil (no-crossing no-octaves chords-alldiff symmetrical-chords? chord-at-measure chord-at-times not-parallel-fifths-octaves not-parallel-intervals) nil)
+				("UTILS" nil nil (get-fn collect-constraints all-true? all-notv-memberv om-mod om-rem mk-poly simple->poly
+						          phr-constraints::orchestra-ranges phr-constraints::i-range) nil)			
+			    ))
 #|
 ;MODEL 1 - NO SUBFOLDER -> (library (functions))
 
