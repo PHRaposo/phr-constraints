@@ -87,6 +87,11 @@
   :icon 486 
   (om?::all-notv-memberv vars sequence))
 
+(defmethod! list-memberv? ((l1 list) (l2 list))
+:initvals '(nil nil) :indoc '("list" "list")
+:icon 476
+(screamer::memberv (om?::list-elements-ofv l1) l2))
+
 (defun no-oct (vars)
 "Constraint all variables to not form octaves (unisons are allowed)."
  (let ((variables (variables-in vars)))
