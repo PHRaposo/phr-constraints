@@ -402,13 +402,10 @@ Returns a list of screamer-score-constraint objects."
    (let ((constraints (loop for chord in chords
                              collect (eval `#'(lambda (x)
                                                 "chord-at-measure"
-                                                 (mapcar #'(lambda (x)
-                                                            (screamer::assert! (screamer::memberv x ,(reclist-vars chord))))
-                                                  (variables-in (flat x)))
-												  t)))))
+                                                  (all-membersv (list! x) ,(reclist-vars chord)))))))
     (loop for mes in measures
              for cs in constraints
-   collect (constraint-measure (constraint-harmony cs "list" "voices-list" :voices voices) mes))))
+   collect (constraint-measure (constraint-one-voice cs "n-inputs" voices "pitch") mes))))
 
 (defmethod! chord-at-times ((chords list) (onsets list) (voices list) &optional (mode "midi"))
   :initvals '( nil nil nil "midi")
@@ -427,23 +424,21 @@ content of the given chord <pcs> or exactly the same notes of the chord <midi> -
 
 Returns a list of screamer-score-constraint objects."
   :icon 486
-(if (= 1 (length voices))
-    (progn (om-message-dialog "YOU MUST SELECT AT TWO OR MORE VOICES FOR CHORD_AT-TIMES") (om-abort))
    (let* ((onset-pairs (mapcar #'list (butlast (x-append 0 onsets)) onsets))
            (constraints (loop for chord in chords
                               for onset-pair in onset-pairs
                               collect  (eval `#'(lambda (x) "chord-at-times"
                                                          (let ((onset (second x)))
-                                                        (if (null (car (remove-duplicates (flat (first x)))))
+                                                        (if (null (first x))
                                                              t
                                                              (if (and (>= onset ,(first onset-pair))
                                                                          (< onset ,(second onset-pair)))
                                                                  (if (equal ,mode "midi")
-                                                                     (all-membersv (remove nil (flat (list! (first x)))) ,(reclist-vars chord))
-                                                                     (all-membersv (m->pcv (remove nil (flat (list! (first x)))))  ,(reclist-vars (remove-duplicates (m->pcv chord)))))
+                                                                     (all-membersv (list! (first x)) ,(reclist-vars chord))
+                                                                     (all-membersv (m->pcv (list! (first x)))  ,(reclist-vars (remove-duplicates (m->pcv chord)))))
                                                              t))))))))
     (loop for cs in constraints
-             collect (constraint-harmony cs "n-inputs" "voices-list" :voices voices :domain "chords-pitch-onset")))))
+             collect (constraint-one-voice cs "n-inputs" voices "pitch-onset"))))
 
 (defmethod! symmetrical-chords? ((input-mode string) &key (voices '(0 1 2)))
   :initvals '("all-voices" (0 1 2))
@@ -505,3 +500,22 @@ the function will return t, otherwise returns nil."
                                      (no-oct x)))))
   (constraint-harmony constraint "n-inputs" "voices-list" :voices voices)))
 
+(defmethod! NOT-DIRECT-FIFTHS-OCTAVES ((voices list))
+ :initvals '((0 1))
+ :indoc '("list or list-of-lists")
+ :doc "Constraints selected voices to not form direct fifths or octaves"
+ :icon 486 
+ (let ((constraint (eval `(lambda (x y)
+                            "NOT DIRECT FIFTHS AND OCTAVES"
+							(?::ifv (direct? x y)
+							        (screamer::notv
+								     (screamer::memberv
+									  (modv (om-absv (screamer::-v (first y) (second y)))
+									         12)
+								      '(0 7)))
+									t)))))
+					
+  (constraint-harmony constraint
+	  	              "n-inputs"
+	  				  "voices-list"
+					   :voices voices)))
