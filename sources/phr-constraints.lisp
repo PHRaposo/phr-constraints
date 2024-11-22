@@ -392,9 +392,10 @@ the function will return t, otherwise returns nil."
                                                                                                           voices-list
                                                                                                          (om?::asc-permutations voices-list 2)))))
 
-(defmethod! chord-at-measure ((measures list) (chords list) (voices list))
+(defmethod! chord-at-measure ((chords list) (measures list) (voices list) &optional (mode "midi"))
   :initvals '( nil nil nil)
   :indoc '("list" "list" "list")
+  :menuins '((3 (("midi" "midi") ("pc" "pc"))))
   :doc "Constraint all notes of a voice (or voices) to be members of chord at measure number.
 
 Returns a list of screamer-score-constraint objects."
@@ -402,7 +403,10 @@ Returns a list of screamer-score-constraint objects."
    (let ((constraints (loop for chord in chords
                              collect (eval `#'(lambda (x)
                                                 "chord-at-measure"
-                                                  (all-membersv (list! x) ,(reclist-vars chord)))))))
+                                                 (if (equal ,mode "midi")
+                                                     (all-membersv (list! x) ,(reclist-vars chord))
+                                                     (all-membersv (m->pcv (list! x))  ,(reclist-vars (remove-duplicates (m->pcv chord))))))))))
+                                                  ;(all-membersv (list! x) ,(reclist-vars chord)))))))
     (loop for mes in measures
              for cs in constraints
    collect (constraint-measure (constraint-one-voice cs "n-inputs" voices "pitch") mes))))
