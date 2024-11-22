@@ -19,8 +19,7 @@
 		                 (om-relative-path '("sources") "phr-constraints")
 						 (om::om-relative-path '("sources") "analysis-tools")
 		                 (om-relative-path '("sources") "all-instrument-ranges")
-		                 (om-relative-path '("sources") "instrument-ranges")
-				 (om-relative-path '("sources" "OM-Screamer-patches") "compile-screamer-score-constraint-fix")						 						 						 
+		                 (om-relative-path '("sources") "instrument-ranges")						 						 						 
                                ))
 
 ;--------------------------------------------------
