@@ -19,7 +19,9 @@
 		                 (om-relative-path '("sources") "phr-constraints")
 						 (om::om-relative-path '("sources") "analysis-tools")
 		                 (om-relative-path '("sources") "all-instrument-ranges")
-		                 (om-relative-path '("sources") "instrument-ranges")						 						 						 
+		                 (om-relative-path '("sources") "instrument-ranges")
+		                 ;(om-relative-path '("sources") "print-screamer-score") ;<== IN-PROGRESS						 
+		                 ;(om-relative-path '("sources") "guitar-playable-chord") ;<== IN-PROGRESS						 						 						 
                                ))
 
 ;--------------------------------------------------
@@ -31,9 +33,10 @@
 ;Fill library
 ;--------------------------------------------------
 
-(fill-library '(("MELODIC" nil nil (allowed-melodic-intervals constraint-motifs constraint-scale mel-line-intervals) nil)
+(fill-library '(("SCREAMER-SCORE" nil nil (print-screamer-score) nil)
+                ("MELODIC" nil nil (allowed-melodic-intervals constraint-motifs constraint-scale mel-line-intervals) nil)
 		        ("HARMONIC" nil nil (no-crossing no-octaves chords-alldiff symmetrical-chords? chord-at-measure chord-at-times not-parallel-fifths-octaves not-parallel-intervals) nil)
-				("UTILS" nil nil (get-fn collect-constraints all-true? all-notv-memberv om-mod om-rem mk-poly simple->poly
+				("UTILS" nil nil (get-fn collect-constraints all-true? list-memberv? all-notv-memberv all-ascendingv all-descendingv list-maxv list-minv om-mod om-rem mk-poly simple->poly
 						          phr-constraints::orchestra-ranges phr-constraints::i-range) nil)			
 			    ))
 #|
