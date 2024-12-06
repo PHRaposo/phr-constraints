@@ -69,7 +69,7 @@
   (cond ((equal select :all)
          (remove nil cs))
         ((listp select)
-         (posn-match (remove nil cs) select))
+         (remove nil (posn-match cs select)))
         (t (om-message-dialog "SELECT MUST BE THE SYMBOL :ALL OR A LIST OF POSITIONS")
            (om-abort))))
 
@@ -99,6 +99,34 @@
       t
     (all-notv-memberv (all-intervalsv variables) (remove 0 (arithm-ser -120 120 12))))))
 	
+(defmethod! list-maxv ((x list))
+:initvals '(nil)
+:indoc '("list")
+:doc "Returns a SCREAMER variable constrained to be the maximun value of a list of variables."
+:icon 480
+(apply #'screamer::maxv x))
+
+	
+(defmethod! list-minv ((x list))
+:initvals '(nil)
+:indoc '("list")
+:doc "Returns a SCREAMER variable constrained to be the minimun value of a list of variables."
+:icon 480
+(apply #'screamer::minv x))
+
+(defmethod! all-ascendingv ((x list))
+:initvals '(nil)
+:indoc '("list")
+:doc "TODO"
+:icon 474
+(apply #'screamer::<v x))
+
+(defmethod! all-descendingv ((x list))
+:initvals '(nil)
+:indoc '("list")
+:doc "TODO"
+:icon 474
+(apply #'screamer::<v x))
 
 (defmethod! om-mod ((n number) (d number))
 :initvals '(-3 12)

@@ -46,6 +46,7 @@
 						VOICES: voices-list
 						DOMAIN: "pitch" "pitch-dur" "pitch-onset" "pitch-dur-onset"
 						&KEY
+                                                 :rests "include" "exclude"
 						 :percentage-mode "off" "exactly" "less-than" "greater-than" "between"
 						 :percent number or list (for "between")
 						 :cs-mode | NOT IMPLEMENTED | 
@@ -56,7 +57,8 @@
 	  				  VOICE-SELECT: "all-voices" "voices-list"
 					  &KEY
 					   :voices list ,e.g. '(0 1 2)
-					   :domain "pitch" | "pitch-dur", "pitch-onset", "pitch-dur-onset" NOT IMPLEMENTED |
+					   :domain "pitch" "pitch-dur", "pitch-onset", "pitch-dur-onset"
+                                           :rests "include" "exclude"
 					   :beats "all" "on-beat" "off-beat" "1st-beat" (of measure)
 					   :percentage-mode "off" "exactly" "less-than" "greater-than" "between"
 					   :percent number or list (for "between")
