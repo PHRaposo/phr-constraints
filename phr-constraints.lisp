@@ -20,8 +20,7 @@
 						 (om::om-relative-path '("sources") "analysis-tools")
 		                 (om-relative-path '("sources") "all-instrument-ranges")
 		                 (om-relative-path '("sources") "instrument-ranges")
-		                 ;(om-relative-path '("sources") "print-screamer-score") ;<== IN-PROGRESS						 
-		                 ;(om-relative-path '("sources") "guitar-playable-chord") ;<== IN-PROGRESS						 						 						 
+		                 (om-relative-path '("sources") "new-functions") ;<== FOR NEXT UPDATE					 						 						 
                                ))
 
 ;--------------------------------------------------
