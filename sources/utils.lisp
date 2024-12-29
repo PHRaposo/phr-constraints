@@ -176,3 +176,22 @@
                             else
                            collect (make-instance 'voice :tree (reduce-rt (mktree r time-sigs)) :tempo tempo))))
 (make-instance 'poly :voices voices)))
+
+;;;RHYTHMIC CONSTRUCTOR
+
+(defmethod! cons-tree ((timesig list) (puls list) (subdiv list))
+  :initvals '( ( (5 8) (6 8) (6 8)) ((2 3) (2 2 2) (1)) (((1 1) (1 1 1)) ((1 1) (1 1) (1 1)) ((1.0))))
+  :indoc '( "list" "list" "list")
+  :doc
+"Constructs a rhythmic tree from three arguments:
+(1) A list of time signatures;
+(2) A list of lists of pulses subdivisions;
+(3) A list of lists of beats subdivisions.
+"
+  :icon 254
+(list '?
+      (mapcar #'(lambda (tim p s)
+                 (list tim
+                      (mapcar #'list p s)))
+       timesig puls subdiv)))
+
