@@ -17,7 +17,7 @@
 				 (om-relative-path '("sources") "package")
 		                 (om-relative-path '("sources") "utils")	 
 		                 (om-relative-path '("sources") "phr-constraints")
-						 (om::om-relative-path '("sources") "analysis-tools")
+				 (om::om-relative-path '("sources") "analysis-tools")
 		                 (om-relative-path '("sources") "all-instrument-ranges")
 		                 (om-relative-path '("sources") "instrument-ranges")
 		                 (om-relative-path '("sources") "new-functions") ;<== FOR NEXT UPDATE					 						 						 
