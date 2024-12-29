@@ -13,17 +13,23 @@
  ;; SCREAMER-PLUS
  (in-package :screamer+)
  
- (screamer::defmacro-compile-time condv (&rest clauses)
-  "Equivalent of COND macro for Screamer."
-  (if (null clauses)
-      nil
-      (let* ((clause (first clauses))
-             (test (first clause))
-             (consequent (second clause))
-             (alternate (if (null (rest clauses))
-                            nil
-                            `(condv ,@(rest clauses)))))
-        `(ifv ,test ,consequent ,alternate))))
+(defun any-integerpv (x &key (full-propagation nil))
+ "This function returns true if a number is an integer. Works with integers, floats or rational numbers. 
+ If x is an unbound variable at function invocation and full-propagation is t, this function will also remove any 
+ non-integer number from the variable enumerated domain."
+(if (bound? x)
+    (zerop (mod x 1))
+     (let ((z (a-booleanv)))
+      (assert! (eqv z (funcallv #'zerop (funcallv #'mod x 1))))
+      (attach-noticer!
+       #'(lambda()
+	   (when (and full-propagation (not (bound? x))(enumerated-domain-p x) (not (bound? z)))
+	    (assert!-memberv-internal
+		 x
+		(remove-if #'(lambda(e) (plusp (mod e 1)))
+			   (variable-enumerated-domain x)))))
+	    x)
+    z)))
 
  ;; =================== ;
  ;; OM  
@@ -34,4 +40,3 @@
 :initvals '(nil nil) :indoc '("list" "list")
 :icon 476
 (om?::lists=v l1 l2))
-
