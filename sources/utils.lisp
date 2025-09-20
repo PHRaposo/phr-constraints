@@ -40,7 +40,8 @@
 
 (defun all-notv-memberv (e sequence)
  (let ((sequence-flat (om::flat sequence)))
-  (cond ((listp e) (apply #'andv (mapcar #'(lambda (x) (notv (memberv x sequence-flat))) (om::flat e))))
+  (cond ((listp e)
+         (apply #'andv (mapcar #'(lambda (x) (notv (memberv x sequence-flat))) (om::flat e))))
          (t (notv (memberv e sequence-flat))))))
 
 ;;=================================;;

@@ -116,7 +116,7 @@
                                                                                                             when (= curr-len (length motif))
                                                                                                             collect motif)))))
           when (= (1- (length vars)) curr-len)
-          collect (let ((test (screamer::memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs)))
+          collect (let ((test (om?::listv-memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs)))
                        (setf curr-motifs nil)
                        (setf curr-len nil)
                           (if chain? (setf vars (last vars)) (setf vars nil) )
@@ -127,7 +127,7 @@
                                                    when (= m-len (length motif))
                                                    collect motif)) 
             when (= (1- (length vars)) m-len)
-            do (push-end (screamer::memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs) tests)))
+            do (push-end (om?::listv-memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs) tests)))
   tests
   ))
   
@@ -297,15 +297,15 @@ the function will return t, otherwise returns nil."
 
 (if (equal mode "pcs")
     (let ((constraint (eval `#'(lambda (x) "constraint-scale-pcs" (if (atom x) 
-                                                                                                     (?::hard-memberv  x ,(reclist-vars (m->pcv scale)))
-                                                                                        (mapcar #'(lambda (xx) (?::hard-memberv xx ,(reclist-vars (m->pcv scale))))
-                                                                                                (flat x)))))))
+                                                                      (screamer::memberv x ,(reclist-vars (m->pcv scale)))
+                                                        (mapcar #'(lambda (xx) (screamer::memberv xx ,(reclist-vars (m->pcv scale))))
+                                                                (flat x)))))))
      (constraint-one-voice constraint  "n-inputs" voices-list "pitch"))
 
     (let ((constraint  (eval `#'(lambda (x) "constraint-scale-midi" (if (atom x) 
-                                                                                                      (?::hard-memberv (m->pcv  x) ,(reclist-vars (m->pcv scale)))
-                                                                                                      (mapcar #'(lambda (xx) (?::hard-memberv (m->pcv xx) ,(reclist-vars (m->pcv scale)))) 
-                                                                                                              (flat x)))))))
+                                                                        (screamer::memberv (m->pcv  x) ,(reclist-vars (m->pcv scale)))
+                                                                        (mapcar #'(lambda (xx) (screamer::memberv (m->pcv xx) ,(reclist-vars (m->pcv scale)))) 
+                                                                                (flat x)))))))
      (constraint-one-voice constraint  "n-inputs" voices-list "pitch"))))
 
 (defmethod! chords-alldiff ((mode string) (input-mode string) &optional voices-list)
@@ -316,8 +316,9 @@ the function will return t, otherwise returns nil."
                          (1 (("all-voices" "all-voices") ("voices-list" "voices-list"))))
     :icon 486
     (let ((constraint (if (equal mode "midi")
-                                 (eval ` #'(lambda (x) "chords-alldiff" (apply 's::/=v (remove nil (flat x)))))
-                                 (eval `#'(lambda (x) "chords-alldiff" (apply 's::/=v  (m->pcv (remove nil (flat x)))))))))
+                          (eval ` #'(lambda (x) "chords-alldiff" (apply #'screamer::/=v (remove nil (flat x)))))
+                          (eval `#'(lambda (x) "chords-alldiff" (let ((pcsv (mapcar #'(lambda (el) (screamer::funcallv #'mod el 12)) (remove nil (flat x)))))
+                                                                 (apply #'screamer::/=v pcsv)))))))
     (if (equal input-mode "all-voices")
        (constraint-harmony constraint  "n-inputs" "all-voices")
        (constraint-harmony constraint  "n-inputs" "voices-list" :voices voices-list))))
@@ -330,16 +331,16 @@ the function will return t, otherwise returns nil."
                          (1 (("no" "no") ("yes" "yes"))))
     :icon 486
     (let ((constraint (if (equal unison? "no")
-                                 (eval `#'(lambda (x) "no-crossing" 
-                                            (let ((vars (remove nil (flat x))))
-                                                (if vars 
-                                                   (apply #'s::>v vars)
-                                                    t))))
-                                 (eval `#'(lambda (x) "no-crossing" 
-                                            (let ((vars (remove nil (flat x))))
-                                                (if vars 
-                                                   (apply #'s::>=v vars)
-                                                    t)))))))
+                          (eval `#'(lambda (x) "no-crossing" 
+                                    (let ((vars (remove nil (flat x))))
+                                        (if vars 
+                                            (apply #'s::>v vars)
+                                            t))))
+                          (eval `#'(lambda (x) "no-crossing" 
+                                    (let ((vars (remove nil (flat x))))
+                                        (if vars 
+                                            (apply #'s::>=v vars)
+                                            t)))))))
 
     (if (equal input-mode "all-voices")
        (constraint-harmony constraint  "n-inputs" "all-voices")
@@ -361,14 +362,14 @@ the function will return t, otherwise returns nil."
                      (interval2 (s::funcallv #'mod (om?::absv (s::-v (first y) (second y))) 12)))
 
               (?::ifv (parallel? x y)
-                   (s::orv (s::notv (s::memberv interval1 '(0 7)))
-                                        (s::notv (s::memberv interval2 '(0 7))))
+                      (s::orv (s::notv (s::memberv interval1 '(0 7)))
+                              (s::notv (s::memberv interval2 '(0 7))))
 
                t))))))))
 
    (constraint-harmony constraint  "n-inputs" "voices-list" :voices (if (list-of-listp voices-list) 
-                                                                                                          voices-list
-                                                                                                         (om?::asc-permutations voices-list 2)))))
+                                                                         voices-list
+                                                                        (om?::asc-permutations voices-list 2)))))
 (defmethod! not-parallel-intervals ((voices-list list) (intervals list))
     :initvals '( ((0 1) (0 2)) (0 7))
     :indoc '("list" "list")
@@ -391,8 +392,8 @@ the function will return t, otherwise returns nil."
                t))))))))
 
    (constraint-harmony constraint  "n-inputs" "voices-list" :voices (if (list-of-listp voices-list) 
-                                                                                                          voices-list
-                                                                                                         (om?::asc-permutations voices-list 2)))))
+                                                                         voices-list
+                                                                        (om?::asc-permutations voices-list 2)))))
 
 (defmethod! chord-at-measure ((chords list) (measures list) (voices list) &optional (mode "midi"))
   :initvals '( nil nil nil)
