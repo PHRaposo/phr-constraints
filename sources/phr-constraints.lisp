@@ -316,9 +316,9 @@ the function will return t, otherwise returns nil."
                          (1 (("all-voices" "all-voices") ("voices-list" "voices-list"))))
     :icon 486
     (let ((constraint (if (equal mode "midi")
-                          (eval ` #'(lambda (x) "chords-alldiff" (apply #'screamer::/=v (remove nil (flat x)))))
+                          (eval ` #'(lambda (x) "chords-alldiff" (screamer::all-differentv (remove nil (flat x)))))
                           (eval `#'(lambda (x) "chords-alldiff" (let ((pcsv (mapcar #'(lambda (el) (screamer::funcallv #'mod el 12)) (remove nil (flat x)))))
-                                                                 (apply #'screamer::/=v pcsv)))))))
+                                                                 (screamer::all-differentv pcsv)))))))
     (if (equal input-mode "all-voices")
        (constraint-harmony constraint  "n-inputs" "all-voices")
        (constraint-harmony constraint  "n-inputs" "voices-list" :voices voices-list))))
