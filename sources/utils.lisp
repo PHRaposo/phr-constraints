@@ -159,9 +159,9 @@
 (let ((voices (loop for r in rtm
                             when r
                             collect (cond ((voice-p r) r)
-                                                  ((and (listp r) (every #'numberp r))
-                                                   (make-instance 'voice :tree (reduce-rt (mktree r time-sigs)) :tempo tempo))
-                                                  (t (make-instance 'voice :tree r :tempo tempo))))))
+                                          ((and (listp r) (every #'numberp r))
+                                           (make-instance 'voice :tree (reduce-rt (mktree r time-sigs)) :tempo tempo))
+                                          (t (make-instance 'voice :tree r :tempo tempo))))))
 (make-instance 'poly :voices voices)))
 
 (defmethod! simple->poly ((tempo number)(time-sigs list) (ratios list) (chord-seq t) (voices list))

@@ -108,7 +108,7 @@
   (defun constraint-motifs-internal  (x motifs &optional chain?)
   (let ((vars '())
           (motif-lengths (remove-duplicates (mapcar #'length motifs)))
-          curr-len curr-motifs  tests)
+          curr-len curr-motifs tests last-var)
   (setf tests (loop for var in x
            do (progn (setf vars (push-end var vars))
                             (when (null curr-len) (progn (setf curr-len (nth-random motif-lengths)) 
@@ -119,7 +119,15 @@
           collect (let ((test (om?::listv-memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs)))
                        (setf curr-motifs nil)
                        (setf curr-len nil)
-                          (if chain? (setf vars (last vars)) (setf vars nil) )
+                       (cond ((null chain?) (setf vars nil))
+                             ((eq chain? t) (setf vars (last vars)))
+                             ((listp chain?)
+                              (if (null last-var)
+                                  (progn (setf last-var (om::last-elem vars))
+                                         (setf vars nil))
+                                  (progn (setf test (list test (screamer::memberv (screamer::-v (first vars) last-var) chain?)))
+                                         (setf last-var (om::last-elem vars))
+                                         (setf vars nil)))))
                        test)))
   (when (not (null vars))
    (loop for m-len in motif-lengths
@@ -128,19 +136,24 @@
                                                    collect motif)) 
             when (= (1- (length vars)) m-len)
             do (push-end (om?::listv-memberv (om?::list-elements-ofv (x->dxv vars)) curr-motifs) tests)))
-  tests
+  (om::flat tests)
   ))
   
 (defmethod! CONSTRAINT-MOTIFS ((voices list) (motifs list) (chain? om::t))
    :initvals '( (0) ((-3 7) (3 -7) (4 -7) (-4 7)) nil)
    :indoc '("list" "list" "t or nil")
-   :doc "CONSTRAINT SELECTED VOICES TO FOLLOW THE INTERVAL MOTIFS (LIST OF LISTS OF INTERVALS)."
+   :doc "
+CONSTRAINT SELECTED VOICES TO FOLLOW THE INTERVAL MOTIFS (LIST OF LISTS OF INTERVALS).
+CHAIN?: The third argument is used to control the next note of the motif.
+  - If it is NIL, the next note is randomly selected. 
+  - If it is T, the last note of a motif becomes the first note of the the next motif.
+  - List of intervals: if a list is supplied, e.g. '(1 -1), the interval between the last note of a motif and the first note of the next must be a member of this interval list (not absolute)."
    :menuins '((2 (("t" t) ("nil" nil))))
    :icon 486 
    (let ((constraint (eval `(lambda (x)
                               "CONSTRAINT-MOTIFS" 
                              (apply #'screamer::andv 
-								 (constraint-motifs-internal x ,(reclist-vars motifs) ,chain?))))))
+								 (constraint-motifs-internal x ,(reclist-vars motifs) ,(reclist-vars chain?)))))))
 
     (constraint-one-voice constraint "list" voices "pitch")))
 							
