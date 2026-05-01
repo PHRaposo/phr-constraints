@@ -40,3 +40,16 @@
 :initvals '(nil nil) :indoc '("list" "list")
 :icon 476
 (om?::lists=v l1 l2))
+
+(defmethod! max-harmonic-interval ((max-int number))
+ :initvals '(12)
+ :indoc '("number")
+ :doc "Constraint all voices to the maximum harmonic interval."
+ :icon 486
+ (let ((constraint (eval `(lambda (input interval) 
+                            "max-harmonic-interval"
+                           (let ((variables (remove nil (flat input))))
+                            (screamer:<=v (screamer:-v (last-elem variables)
+						       (first variables))
+		                         ,(reclist-vars max-int)))))))
+  (constraint-harmony constraint "n-inputs" "all-voices")))

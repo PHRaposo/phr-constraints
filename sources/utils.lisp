@@ -127,7 +127,7 @@
 :indoc '("list")
 :doc "TODO"
 :icon 474
-(apply #'screamer::<v x))
+(apply #'screamer::>v x))
 
 (defmethod! om-mod ((n number) (d number))
 :initvals '(-3 12)
