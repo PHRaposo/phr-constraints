@@ -1,0 +1,25 @@
+
+*.lisp~
+*.*~
+*.xfasl
+*.64xfasl
+*.ofasl
+*.*ufasl
+#*#
+*.tex~
+*.out
+*.aux
+*.log
+*.blg
+*.bbl
+
+.finderinfo
+.DS_Store
+
+# don't track auto-generated html's:
+/**/reference/
+/**/reference-pages/
+
+*.lisp#
+*.zip
+examples/04-sample patches/.finderinfo
